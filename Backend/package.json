@@ -1,11 +1,19 @@
 {
-  "name": "backend",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
-  "description": ""
-}
+     "name": "Backend",
+     "version": "1.0.0",
+     "description": "",
+     "main": "app.js",
+     "scripts": {"start":"set NODE_ENV=PRODUCTION & node app.js","dev":"npx nodemon app.js"}
+     ,
+     "keywords": [],
+     "author": "",
+     "type": "module",
+     "license": "ISC",
+     "dependencies": {
+        "express": "4.19.2","cors": "2.8.5","morgan": "1.10.0","dotenv": "16.4.5"
+     }, 
+        "devDependencies": {
+          "nodemon": "3.1.4"
+        }
+      
+      }
