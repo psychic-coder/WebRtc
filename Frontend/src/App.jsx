@@ -1,8 +1,13 @@
 import React from 'react'
+import { Route, Routes } from 'react-router-dom'
+import LobbyScreen from './Screens/Lobby'
+
 
 const App = () => {
   return (
-    <div>App</div>
+    <Routes>
+      <Route path="/" element={<LobbyScreen/>} />
+    </Routes>
   )
 }
 
