@@ -5,7 +5,9 @@ const io = new Server(8000, {
   cors: true,
 });
 
+//we're are making the socket.id for this email;
 const emailToSocketIdMap = new Map();
+//we're reversing and getting the email id on the basis of the socket
 const socketidToEmailMap = new Map();
 
 io.on("connection", (socket) => {
@@ -14,6 +16,7 @@ io.on("connection", (socket) => {
     const { email, room } = data;
     emailToSocketIdMap.set(email, socket.id);
     socketidToEmailMap.set(socket.id, email);
+    //when the new user tries to koin the room then the users already present in the room gets to know who's joing as they'll will receive the emailid of the new user
     io.to(room).emit("user:joined", { email, id: socket.id });
     socket.join(room);
     io.to(socket.id).emit("room:join", data);
