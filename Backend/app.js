@@ -1,53 +1,39 @@
-import express from 'express';
-import cors from 'cors';
-import { errorMiddleware } from './middlewares/error.js';
-import morgan from 'morgan';
-import dotenv from 'dotenv';
-import { createServer } from 'http'; // Import http to create a server instance
-import { Server } from 'socket.io';
-
-dotenv.config({ path: './.env' });
-
-export const envMode = process.env.NODE_ENV?.trim() || 'DEVELOPMENT';
-const port = process.env.PORT || 3001;
-
-const app = express();
-
-// Middlewares
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cors({ origin: '*', credentials: true }));
-app.use(morgan('dev'));
+import { Server } from "socket.io";
 
 
-const httpServer = createServer(app); 
-
-
-const io = new Server(8000);
-
-io.on('connection', (socket) => {
-  console.log('Socket connected', socket.id);
-
-
+const io = new Server(8000, {
+  cors: true,
 });
 
+const emailToSocketIdMap = new Map();
+const socketidToEmailMap = new Map();
 
-app.get('/', (req, res) => {
-  res.send('Hello, World!');
-});
-
-
-app.get('*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'Page not found',
+io.on("connection", (socket) => {
+  console.log(`Socket Connected`, socket.id);
+  socket.on("room:join", (data) => {
+    const { email, room } = data;
+    emailToSocketIdMap.set(email, socket.id);
+    socketidToEmailMap.set(socket.id, email);
+    io.to(room).emit("user:joined", { email, id: socket.id });
+    socket.join(room);
+    io.to(socket.id).emit("room:join", data);
   });
-});
 
+  socket.on("user:call", ({ to, offer }) => {
+    io.to(to).emit("incomming:call", { from: socket.id, offer });
+  });
 
-app.use(errorMiddleware);
+  socket.on("call:accepted", ({ to, ans }) => {
+    io.to(to).emit("call:accepted", { from: socket.id, ans });
+  });
 
-// Start the server with Express and Socket.IO on the same port
-httpServer.listen(port, () => {
-  console.log(`Server is working on Port: ${port}.`);
+  socket.on("peer:nego:needed", ({ to, offer }) => {
+    console.log("peer:nego:needed", offer);
+    io.to(to).emit("peer:nego:needed", { from: socket.id, offer });
+  });
+
+  socket.on("peer:nego:done", ({ to, ans }) => {
+    console.log("peer:nego:done", ans);
+    io.to(to).emit("peer:nego:final", { from: socket.id, ans });
+  });
 });
