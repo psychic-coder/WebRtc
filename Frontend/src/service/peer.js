@@ -5,6 +5,7 @@ class PeerService {
           iceServers: [
             {
               urls: [
+                //the below are the peer servers which are needed to connect to the open servers
                 "stun:stun.l.google.com:19302",
                 "stun:global.stun.twilio.com:3478",
               ],
@@ -30,6 +31,7 @@ class PeerService {
     }
   
     async getOffer() {
+        
       if (this.peer) {
         const offer = await this.peer.createOffer();
         await this.peer.setLocalDescription(new RTCSessionDescription(offer));
