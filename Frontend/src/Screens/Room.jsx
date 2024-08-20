@@ -33,13 +33,20 @@ const Room = () => {
     setMyStream(stream);
     const ans = await peer.getAnswer(offer);
     socket.emit("call:accepted", { to: from, ans });
-  }, [socket]);
+  })
 
-  const sendStreams = useCallback(() => {
+  //can see the sending the stream
+  const sendStreams = useCallback(async () => {
+    const senders = peer.peer.getSenders();
+    const existingTracks = senders.map(sender => sender.track);
+  
     for (const track of myStream.getTracks()) {
-      peer.peer.addTrack(track, myStream);
+      if (!existingTracks.includes(track)) {
+        peer.peer.addTrack(track, myStream);
+      }
     }
   }, [myStream]);
+  
 
   const handleCallAccepted = useCallback(
     ({ from, ans }) => {
