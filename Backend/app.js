@@ -4,7 +4,9 @@ const io = new Server(8000, {
   cors: true,
 });
 
+//the below is used for mapping socket to id
 const emailToSocketIdMap = new Map();
+//the below is used for mapping socket to email
 const socketidToEmailMap = new Map();
 
 io.on("connection", (socket) => {
